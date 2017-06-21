@@ -27,14 +27,14 @@ public class FileEdit extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_edit);
 
-        Intent intentResp = getIntent();
-        Bundle bundle = intentResp.getExtras();
+        Intent intentS  = getIntent();
+        Bundle bundle = intentS.getExtras();
         final String strFileName = bundle.getString(KEY_NAME);
 
         ((TextView)findViewById(R.id.edtName)).setText(strFileName);
 
         try {
-            strTxtFile = loadClickedFile(strFileName);
+            strTxtFile = loadClickedFileContent(strFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -73,20 +73,21 @@ public class FileEdit extends AppCompatActivity {
                 if((strTxtFile.equals(afterEdit))){
                     Toast.makeText(FileEdit.this,"Nothing edited",Toast.LENGTH_LONG).show();
                 }else {
-                    //((EditText)findViewById(R.id.edtTempNotepad)).setText(" ");
+                    ((EditText)findViewById(R.id.edtData)).setText("");
+                    ((EditText)findViewById(R.id.edtData)).setText(afterEdit);
+                    //FileOutputStream fos = null;
 
-                    FileOutputStream fos = null;
                     try {
-                        fos = openFileOutput(strFileName, MODE_APPEND);
+                        FileOutputStream fos = openFileOutput(strFileName,1);
+                        fos.write(afterEdit.getBytes());
+                        fos.close();
+
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    }
-
-                    try {
-                        fos.write(afterEdit.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     Toast.makeText(FileEdit.this, "Saved", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -94,29 +95,24 @@ public class FileEdit extends AppCompatActivity {
 
     }
 
-    private String loadClickedFile(String strFileName) throws IOException {
-
+    private String loadClickedFileContent(String strFileName)throws IOException{
         File file = getFilesDir();
-
-        String str = new File(strFileName).getAbsoluteFile().toString();
-
+        String str = new File(strFileName).getAbsolutePath();
         FileInputStream fis = openFileInput(strFileName);
-
         StringBuilder builder = new StringBuilder();
 
         while (true){
             int ch = fis.read();
-            if(ch == -1) break;
-            else builder.append((char)ch);
+            if(ch == -1)break;
+            else builder.append((char) ch);
         }
 
+
         ((EditText)findViewById(R.id.edtData)).setText(builder.toString());
-
-        String beforeEdit = builder.toString();
-
+        String beforeEdit =builder.toString();
         return beforeEdit;
-
     }
+
 
     private void gotoMainActivity() {
         Intent intent=new Intent(FileEdit.this,Edit.class);
