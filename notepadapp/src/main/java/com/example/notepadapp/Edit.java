@@ -22,6 +22,8 @@ public class Edit extends AppCompatActivity {
     public static final String KEY_INFO = "noteInfo";
     public static final String KEY_POSITION = "clickedPosition";
 
+    long size;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,8 @@ public class Edit extends AppCompatActivity {
         for (File fl : files) {
             Date date = new Date(fl.lastModified());
 
-            fileItems.add(new FileItem(R.drawable.ic_note_black_24dp, fl.getName(), "" + (new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(date)), "" + fl.length(), ""));
+            size = fl.length();
+            fileItems.add(new FileItem(R.drawable.ic_note_black_24dp, fl.getName(), "" + (new SimpleDateFormat("dd-MMM-yyyy HH:mm").format(date)),SizeChange(size),""));
         }
 
         ((ListView) findViewById(R.id.lstListOfFiles)).setAdapter(new FileAdapter(this, fileItems));
@@ -74,6 +77,34 @@ public class Edit extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private String SizeChange(long size){
+
+        String hrSize = null;
+
+        double b = size;
+        double k = size/1024.0;
+        double m = ((size/1024.0)/1024.0);
+        double g = (((size/1024.0)/1024.0)/1024.0);
+        double t = ((((size/1024.0)/1024.0)/1024.0)/1024.0);
+
+        DecimalFormat dec = new DecimalFormat("");
+
+        if ( t>1 ) {
+            hrSize = dec.format(t).concat(" TB");
+        } else if ( g>1 ) {
+            hrSize = dec.format(g).concat(" GB");
+        } else if ( m>1 ) {
+            hrSize = dec.format(m).concat(" MB");
+        } else if ( k>1 ) {
+            hrSize = dec.format(k).concat(" KB");
+        } else {
+            hrSize = dec.format(b).concat(" Bytes");
+        }
+
+        return hrSize;
     }
 }
 
